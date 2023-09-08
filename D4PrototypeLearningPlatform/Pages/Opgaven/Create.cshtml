@@ -1,0 +1,57 @@
+﻿@page
+@model D4PrototypeLearningPlatform.Pages.Opgaven.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Opgave</h4>
+<hr />
+<div class="row">
+    <div class="col-md-10">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Opgave.Name" class="control-label"></label>
+                <input asp-for="Opgave.Name" class="form-control" />
+                <span asp-validation-for="Opgave.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Opgave.Description" class="control-label"></label>
+                <input asp-for="Opgave.Description" class="form-control" />
+                <span asp-validation-for="Opgave.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Opgave.Type" class="control-label"></label>
+                <select asp-for="Opgave.Type" class="form-control" asp-items="Html.GetEnumSelectList<ProgrammingLanguage>()"></select>
+                <span asp-validation-for="Opgave.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Opgave.InitialCode" class="control-label"></label>
+                <textarea asp-for="Opgave.InitialCode" class="form-control w-100" rows="25"></textarea>
+                <span asp-validation-for="Opgave.InitialCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Opgave.TestingCode" class="control-label"></label>
+                <p>
+                    Use the code "Successful = true;" if the user code was correct! And Message
+                </p>
+                <textarea asp-for="Opgave.TestingCode" class="form-control w-100" rows="15"></textarea>
+                <span asp-validation-for="Opgave.TestingCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

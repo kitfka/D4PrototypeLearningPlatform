@@ -1,0 +1,156 @@
+﻿@page
+@model SpikeEditorModel
+@{
+	ViewData["Title"] = "Code editor";
+}
+
+<h1>@Model.Opgave.Name</h1>
+<p>@Model.Opgave.Description</p>
+<div class="alert alert-success" role="alert" id="hidden-success-alert">
+	The code is correct!!!! 😊
+</div>
+
+<div class="alert alert-danger" role="alert" id="hidden-danger-alert">
+	Improve the code please!
+</div>
+
+
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">Info</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			
+			
+			<div class="modal-body">
+				Improve the code please!
+			</div>
+
+
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				@*<button type="button" class="btn btn-primary">Understood</button>*@
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="staticBackdropGood" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">Info</h5>
+				@*<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>*@
+			</div>
+
+
+			<div class="modal-body">
+				Goed gedaan!
+			</div>
+
+
+			<div class="modal-footer">
+				@if (Model.CursusId != "")
+				{
+					<a asp-page="/Student/List" asp-route-id="@Model.CursusId" class="btn btn-primary">Back to list!</a>
+				}
+				else
+				{
+					<a asp-page="/Index" class="btn btn-primary">Back to home!</a>
+				}
+
+				@*<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back To List!</button>*@
+				@*<button type="button" class="btn btn-primary">Understood</button>*@
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="editor"></div>
+<button type="button" class="btn btn-primary" onclick="RunCode()">Check code</button>
+@*<button type="button" class="btn btn-primary" onclick="RunTest()">TEST</button>*@
+
+
+@section Scripts {
+
+<script>
+	document.getElementById("hidden-success-alert").style.display = "none";
+	document.getElementById("hidden-danger-alert").style.display = "none";
+	var el = document.getElementById('editor');
+	// window.editor is accessible.
+	var editor = null;
+	var init = function () {
+
+		if (el) {
+			console.log("Loading editor...");
+			el.style.height = '700px';
+			require(['vs/editor/editor.main'], function () {
+				editor = monaco.editor.create(el, {
+					theme: 'vs-dark',
+					//https://stackoverflow.com/questions/4071602/asp-net-mvc-razor-render-without-encoding
+					model: monaco.editor.createModel(`@Html.Raw(Model.Opgave.InitialCode)`, `@Model.Opgave.Type.ToString().ToLower()`)
+				});
+
+				editor.layout();
+			});
+		}
+
+		// no point in keeping this around.
+		window.removeEventListener("load", init);
+	};
+
+	window.addEventListener("load", init);
+
+	function RunCode() {
+		@if (Model.EnableInBrowserCodeRunner) 
+		{
+		<text>
+			let TestRunner = `
+			let Successful = false;
+			console.log("Running Test Code!");
+			@Html.Raw(Model.Opgave.TestingCode)
+			document.getElementById("hidden-success-alert").style.display = "none";
+			document.getElementById("hidden-danger-alert").style.display = "none";
+			if (Successful)
+			{
+				__runSucces();
+			}
+			else
+			{
+				RunTest();
+			}
+			console.log("Test Code Done!");
+			`;
+
+			eval(window.editor.getValue() + TestRunner); // STILL BAD CODE!
+		</text>
+		} 
+		else
+		{
+			@:// Why are you reading this ;)
+			@:console.log("In browser runner is dissabled!");
+		}
+	}
+
+	function RunTest() {
+		//window.editor.getModel().setValue('Hello World!');
+		//document.getElementById('staticBackdrop').focus();
+		var myModalEl = document.querySelector('#staticBackdrop');
+		var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+		modal.show();
+	}
+
+
+	function __runSucces() {
+		//document.getElementById('staticBackdrop').focus();
+		var myModalEl = document.querySelector('#staticBackdropGood');
+		var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+		modal.show();
+	}
+		
+
+</script>
+}
